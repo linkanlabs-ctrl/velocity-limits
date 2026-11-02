@@ -1,0 +1,56 @@
+velocity-limits Free Licence, version 1.0
+
+Copyright (c) 2026 Linkan Labs. All rights reserved.
+
+This licence covers velocity-limits as distributed in compiled form: the wheel files and
+everything in them, called "the Software" below.
+
+1. Free use
+   You may install and use the Software free of charge, for any purpose, including commercial
+   use, on any number of machines, by any number of people in your organisation.
+
+2. Redistribution of unmodified copies
+   You may copy and redistribute exact, unmodified copies of the Software's wheel files,
+   including inside your own applications, container images, package mirrors and private
+   package indexes, as long as this licence stays included and unchanged. You may not charge
+   for the Software itself, but you may charge for your own product that includes it.
+
+3. What you may not do
+   Except as this licence allows, or as applicable law permits despite this restriction, you
+   may not:
+   (a) modify the Software, or distribute modified copies of it;
+   (b) decompile, disassemble or otherwise reverse engineer the compiled parts of the Software,
+       or attempt to derive its source code;
+   (c) remove or change any copyright, licence or ownership notice in the Software;
+   (d) sell, rent or sublicense the Software on its own.
+
+4. Paid editions
+   Any paid edition of the Software, such as a "Pro" edition, has its own terms. This licence
+   grants no right to any paid edition.
+
+5. Ownership
+   The licensor keeps all rights in the Software not expressly granted here, including its
+   copyright and the name "velocity-limits". This licence grants no trademark rights.
+
+6. Copies from PyPI
+   Copies obtained from the Python Package Index (PyPI) also carry the rights that the PyPI
+   Terms of Service give the Python Software Foundation and PyPI's users. Nothing in this
+   licence reduces those rights.
+
+7. Ending
+   This licence ends automatically if you break its terms. It is restored if you correct the
+   breach within 30 days of learning of it. Otherwise you must stop using the Software and
+   delete your copies. Sections 5, 8 and 9 continue after this licence ends.
+
+8. No warranty
+   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+   INCLUDING THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+   NON-INFRINGEMENT.
+
+9. Limitation of liability
+   TO THE EXTENT THE LAW ALLOWS, THE LICENSOR IS NOT LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+   LIABILITY, WHETHER IN CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+   WITH THE SOFTWARE OR ITS USE.
+
+10. Contact
+    Questions, and licences for uses this licence does not allow: linkanlabs@gmail.com.

@@ -1,0 +1,43 @@
+# bench/limiter_compare.py, 2026-11-02, WSL2 on the i7-13700H laptop (on AC power).
+# Rate limits across worker processes on one server: today's free options and velocity_limits 0.1.0.
+# Reading:
+#  - limits (under Flask-Limiter and slowapi) on memory: 3.3 us per check, but every worker keeps its own
+#    count, so 4 workers let through 4x the limit.
+#  - limits on Redis: correct, 178 us per check here (redis-py round trip; Redis's own C client needs
+#    63-79 us p50 on this WSL2 loopback, so expect roughly 50-100 us on a native Linux server). Needs a Redis
+#    server, which tops out at 18.7k checks/s for 8 workers here.
+#  - limits on velocity_limits: correct, 1.7 us per check (100x Redis here; the bare table call is 129 ns, the
+#    rest is the limits library itself), and 4.1 M checks/s for 8 workers, 218x Redis.
+#  - pyrate-limiter's SQLite bucket with a file lock: 318 us per check, and in non-blocking mode a busy lock
+#    returns False exactly like "over the limit" (pyrate_limiter/limiter.py, try_acquire catches TimeoutError),
+#    so 4 workers got only 494-607 of the 1000 allowed requests across two runs. With filelock 4.x (current,
+#    4.2.6) the same call raises TypeError: pyrate passes acquire(False) and filelock 4 rejects a bool timeout.
+#    Runs below use filelock 3.32.7.
+# Absolute numbers on this laptop move 10-30% between runs (first run of this script, before velocity_limits
+# existed: limits-memory 3.6 us, limits-redis 210 us, pyrate 400 us and 494 allowed).
+
+##### redis-benchmark (C client, no Python), INCR #####
+unix socket, 1 client:   11,544.68 requests per second, p50=0.063 msec
+unix socket, 20 clients: 102,827.76 requests per second, p50=0.095 msec
+TCP localhost, 1 client:  8,406.89 requests per second, p50=0.079 msec
+
+##### limiter_compare.py #####
+# 13th Gen Intel(R) Core(TM) i7-13700H, 20 logical CPUs, 6.18.54.1-microsoft-standard-WSL2
+# Python 3.12.3; limits 5.8.0; pyrate-limiter 4.5.1; filelock 3.32.7; redis-py 8.1.0; velocity_limits 0.1.0
+
+== 1. one rate-limit check, one process (limit set high so every check is allowed) ==
+  limits-memory                          3,278.8 ns per check   spread 1.26x
+  limits-redis                         177,703.3 ns per check   spread 1.49x
+  limits-velocity                        1,738.0 ns per check   spread 1.80x
+  pyrate-sqlite                        317,630.2 ns per check   spread 1.66x
+  velocity_limits table incr() alone       129.0 ns per check   spread 1.09x
+
+== 2. 4 independently started workers, 1000 attempts each, limit 1000/hour on one key ==
+  limits-memory                     allowed  4000 of 1000  per worker [1000, 1000, 1000, 1000]  WRONG: 4.0x the limit
+  limits-redis                      allowed  1000 of 1000  per worker [248, 256, 254, 242]  correct
+  limits-velocity                   allowed  1000 of 1000  per worker [301, 322, 55, 322]  correct
+  pyrate-sqlite                     allowed   607 of 1000  per worker [242, 121, 119, 125]  WRONG: 0.6x the limit
+
+== 3. 8 workers at once, 20,000 checks each over 1,000 keys ==
+  limits-redis                            18.7 k checks/s in total   (slowest worker 8.55 s)
+  limits-velocity                      4,083.1 k checks/s in total   (slowest worker 0.04 s)

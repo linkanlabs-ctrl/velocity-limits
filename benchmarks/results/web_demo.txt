@@ -1,0 +1,14 @@
+# bench/web_demo.py, 2026-11-02, WSL2 on the i7-13700H laptop. Real servers and libraries, apps in bench/web_demo_apps.py.
+# 4 worker processes, limit 100 requests per minute per client address, 1,000 requests from 16 threads with
+# a new connection each, so requests spread over all workers. A correct limiter lets exactly 100 through.
+# Reading: with each library's default memory:// storage, every worker counts alone and 400 get through, the bug
+# reported in slowapi #226 and Flask-Limiter discussion #373. With velocity:// (one changed storage_uri plus
+# `import velocity_limits`) exactly 100 get through while all 4 workers keep serving.
+
+# Linux-6.18.54.1-microsoft-standard-WSL2-x86_64-with-glibc2.39, Python 3.12.3; flask-limiter 4.1.1, gunicorn 26.2.0, slowapi 0.1.10, uvicorn 0.54.0, limits 5.8.0, velocity_limits 0.1.0
+# 4 workers, limit 100/minute per client, 1000 requests from 16 threads
+
+  Flask-Limiter on gunicorn   memory://    let through  400, refused  600, other 0  workers that served: 4  WRONG: 4.0x the limit
+  Flask-Limiter on gunicorn   velocity://  let through  100, refused  900, other 0  workers that served: 4  correct
+  slowapi on uvicorn          memory://    let through  400, refused  600, other 0  workers that served: 4  WRONG: 4.0x the limit
+  slowapi on uvicorn          velocity://  let through  100, refused  900, other 0  workers that served: 4  correct

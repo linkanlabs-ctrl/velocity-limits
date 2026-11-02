@@ -1,0 +1,23 @@
+# benchmarks/limiter_compare.py, second run, 2026-11-02 evening, same WSL2 laptop, against the installed
+# cp312 manylinux wheel (not a source build). Everything ran slower than in limiters.txt, Redis included,
+# so the laptop was in a slower power state; the ratios hold: 120x per check, 126x throughput.
+
+# 13th Gen Intel(R) Core(TM) i7-13700H, 20 logical CPUs, 6.18.54.1-microsoft-standard-WSL2
+# Python 3.12.3; limits 5.8.0; pyrate-limiter 4.5.1; filelock 3.32.7; redis-py 8.1.0; velocity_limits 0.1.0
+
+== 1. one rate-limit check, one process (limit set high so every check is allowed) ==
+  limits-memory                          5,317.5 ns per check   spread 1.18x
+  limits-redis                         309,614.4 ns per check   spread 1.09x
+  limits-velocity                        2,582.0 ns per check   spread 1.24x
+  pyrate-sqlite                        562,309.8 ns per check   spread 1.60x
+  velocity_limits table incr() alone       173.0 ns per check   spread 1.14x
+
+== 2. 4 independently started workers, 1000 attempts each, limit 1000/hour on one key ==
+  limits-memory                     allowed  4000 of 1000  per worker [1000, 1000, 1000, 1000]  WRONG: 4.0x the limit
+  limits-redis                      allowed  1000 of 1000  per worker [251, 250, 249, 250]  correct
+  limits-velocity                   allowed  1000 of 1000  per worker [244, 255, 333, 168]  correct
+  pyrate-sqlite                     allowed   493 of 1000  per worker [115, 121, 129, 128]  WRONG: 0.5x the limit
+
+== 3. 8 workers at once, 20,000 checks each over 1,000 keys ==
+  limits-redis                            17.9 k checks/s in total   (slowest worker 8.96 s)
+  limits-velocity                      2,253.0 k checks/s in total   (slowest worker 0.07 s)
