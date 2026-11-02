@@ -1,7 +1,5 @@
 # velocity-limits
 
-[![tests](https://github.com/linkanlabs-ctrl/velocity-limits/actions/workflows/tests.yml/badge.svg)](https://github.com/linkanlabs-ctrl/velocity-limits/actions/workflows/tests.yml)
-
 **Rate limits that every worker on your server shares exactly, with no Redis to run.**
 
 Flask-Limiter and slowapi keep their counts in `memory://` unless you configure a storage. Under
@@ -118,10 +116,10 @@ cover:
 - workers killed in the middle of an update 30 times, after which the table still works;
 - the demo itself.
 
-The [tests workflow](.github/workflows/tests.yml) installs the **published wheels** and runs the
-suite and the demo on 25 combinations: Linux x86-64, Linux ARM64, macOS Apple Silicon, macOS
-Intel and Windows, each on Python 3.10–3.14. Before release, each of the 35 wheels also passed the
-suite once installed.
+Before release, each of the 35 wheels passed the suite once installed, on its own platform. The
+[tests workflow](.github/workflows/tests.yml) is set up to install the **published wheels** and run
+the suite and the demo on 25 combinations: Linux x86-64, Linux ARM64, macOS Apple Silicon, macOS
+Intel and Windows, each on Python 3.10–3.14.
 
 ## Limits
 - **One machine.** Workers on one server share a table. Several servers need Redis.
@@ -144,9 +142,9 @@ suite once installed.
 
 **Is the source code available?**
 - No. The engine is closed source, and the wheels are free to use under the [licence](LICENSE.txt).
-- This repository has the documentation, the complete test suite and the benchmarks. Its tests run
-  against the published wheels on every push, so every claim here can be checked without the
-  source.
+- This repository has the documentation, the complete test suite and the benchmarks. The tests run
+  against an installed wheel, so you can check every claim yourself without the source: install
+  it, then run `python -m unittest discover -s tests` from a clone of this repository.
 
 **Can I trust a compiled binary?**
 - The extension makes no network connections.
